@@ -1,0 +1,2 @@
+symfony open:local:webmail
+symfony console messenger:consume async -vv
