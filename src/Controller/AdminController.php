@@ -2,16 +2,19 @@
 
 namespace App\Controller;
 
+use Twig\Environment;
 use App\Entity\Comment;
 use App\Message\CommentMessage;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Workflow\WorkflowInterface;
-use Twig\Environment;
+use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Component\HttpKernel\HttpCache\StoreInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 #[Route('/admin')]
 class AdminController extends AbstractController
@@ -40,7 +43,8 @@ class AdminController extends AbstractController
         $this->entityManager->flush();
 
         if ($accepted) {
-            $this->bus->dispatch(new CommentMessage($comment->getId()));
+            $reviewUrl = $this->generateUrl('review_comment', ['id' => $comment->getId()], UrlGeneratorInterface::ABSOLUTE_URL);
+            $this->bus->dispatch(new CommentMessage($comment->getId(), $reviewUrl));
         }
 
         return new Response($this->twig->render('admin/review.html.twig', [

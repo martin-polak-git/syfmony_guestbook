@@ -1,2 +1,6 @@
 symfony open:local:webmail
+
+
 symfony console messenger:consume async -vv
+symfony run -d --watch=config,src,templates,vendor symfony console messenger:consume async -vv
+
